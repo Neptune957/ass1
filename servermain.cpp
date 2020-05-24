@@ -1,5 +1,3 @@
-#pragma pack(4)
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,7 +21,6 @@
 #define BACKLOG 1  // how many pending connections queue will hold
 #define SECRETSTRING "gimboid"
 
-using namespace std;
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -49,7 +46,7 @@ int main(int argc, char *argv[]){
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags = AI_PASSIVE; // use my IP
 
-  if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
+  if ((rv = getaddrinfo("0.0.0.0", PORT, &hints, &servinfo)) != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
     return 1;
   }
