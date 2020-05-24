@@ -58,13 +58,13 @@ int main(int argc, char *argv[]){
       continue;
     }
 
-    printf("server: setting socket options\n")
+    printf("server: setting socket options\n");
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,sizeof(int)) == -1) {
       printf("server: set socket error\n")
       exit(1);
     }
 
-    printf("server: binding socket\n")
+    printf("server: binding socket\n");
     if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
       close(sockfd);
       printf("server: bind socket error\n")
@@ -77,14 +77,14 @@ int main(int argc, char *argv[]){
 
   if (p == NULL)  {
     fprintf(stderr, "server: failed to bind\n");
-    printf("server: fail to bind the socket\n")
+    printf("server: fail to bind the socket\n");
     exit(1);
   }
 
   printf("server: listening to socekt\n");
   if (listen(sockfd, BACKLOG) == -1) {
     perror("listen");
-    pritnf("server:fail to listen to the socket\n")
+    pritnf("server:fail to listen to the socket\n");
     exit(1);
   }
 
@@ -170,12 +170,16 @@ int main(int argc, char *argv[]){
       memset(msg,0,MAXSZ);
       readSize=recv(new_fd,&msg,MAXSZ,0);
       char *finalResponse;
+      char resultString[MAXSZ];
 
       printf("client: my answer to \"operationCommand\" is: %s\n",msg);
-      if(operation[0]=='f'&&(strcmp(msg,ftoa(fresult))==0)){
-        finalResponse="OK";
-        printf("server: right answer\n");
-      }else if(operation[0]!='f'&&(strcmp(msg,itoa(fresult))==0)){
+      if(operation[0]=='f'){
+        sprintf(resultString,"%8.8g\0",fresult);
+      }else{
+        sprintf(resultString,"%d\0",result);
+      }
+
+      if(strcmp(msg,resultString)==0){
         finalResponse="OK";
         printf("server: right answer\n");
       }else{
