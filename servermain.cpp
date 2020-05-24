@@ -56,18 +56,21 @@ int main(int argc, char *argv[]){
 
   for(p = servinfo; p != NULL; p = p->ai_next) {
     if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+      perror("server: socket");
       continue;
     }
 
     printf("server: setting socket options\n");
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,sizeof(int)) == -1) {
       printf("server: set socket error\n");
+      perror("setsockopt");
       exit(1);
     }
 
     printf("server: binding socket\n");
     if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
       close(sockfd);
+      perror("server: bind");
       printf("server: bind socket error\n");
       continue;
     }
