@@ -40,6 +40,7 @@ int main(int argc, char *argv[]){
   struct addrinfo hints, *servinfo, *p;
   struct sockaddr_storage clientAddr; // connector's address information
   socklen_t sin_size;
+  int yes=1;
   char s[INET6_ADDRSTRLEN];
   int rv;
 
@@ -60,14 +61,14 @@ int main(int argc, char *argv[]){
 
     printf("server: setting socket options\n");
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,sizeof(int)) == -1) {
-      printf("server: set socket error\n")
+      printf("server: set socket error\n");
       exit(1);
     }
 
     printf("server: binding socket\n");
     if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
       close(sockfd);
-      printf("server: bind socket error\n")
+      printf("server: bind socket error\n");
       continue;
     }
 
@@ -84,7 +85,7 @@ int main(int argc, char *argv[]){
   printf("server: listening to socekt\n");
   if (listen(sockfd, BACKLOG) == -1) {
     perror("listen");
-    pritnf("server:fail to listen to the socket\n");
+    printf("server:fail to listen to the socket\n");
     exit(1);
   }
 
@@ -191,6 +192,7 @@ int main(int argc, char *argv[]){
       close(new_fd);
       printf("server: mission has done. stop connection.\n");
       break;
+    }
   }
 
   return 0;
