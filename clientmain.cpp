@@ -37,6 +37,11 @@ int main(int argc, char *argv[]){
 	char buf[MAXDATASIZE];
 	char s[INET6_ADDRSTRLEN];
 
+	if (argc != 2) {
+	  fprintf(stderr,"usage: %s hostname (%d)\n",argv[0],argc);
+	  exit(1);
+	}
+
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
@@ -50,6 +55,7 @@ int main(int argc, char *argv[]){
 	// loop through all the results and make a socket
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+			perror("talker: socket");
 			continue;
 		}
 
@@ -59,7 +65,7 @@ int main(int argc, char *argv[]){
 	if (p == NULL) {
 		fprintf(stderr, "clientmain: failed to create socket\n");
 		printf("client: socket creation failure\n");
-		exit(1);
+		return 2;
 	}
 
 	if (connect(sockfd,p->ai_addr, p->ai_addrlen) < 0 ) {
@@ -76,7 +82,6 @@ int main(int argc, char *argv[]){
 
 	if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
 	  	printf("Error in receiving data from server\n");
-	  	close(sockfd);
 	  	exit(1);
 	}
 	
