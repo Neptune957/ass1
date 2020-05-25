@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <netdb.h>
+#include <arpa/inet.h>
+#include <sys/wait.h>
+#include <signal.h>
 /* You will to add includes here */
 
 
@@ -21,6 +22,17 @@
 #define BACKLOG 1  // how many pending connections queue will hold
 #define SECRETSTRING "gimboid"
 
+void sigchld_handler(int s)
+{
+  (void)s; // quiet unused variable warning
+
+  // waitpid() might overwrite errno, so we save and restore it:
+  int saved_errno = errno;
+
+  while(waitpid(-1, NULL, WNOHANG) > 0);
+
+  errno = saved_errno;
+}
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -38,6 +50,7 @@ int main(int argc, char *argv[]){
   struct sockaddr_storage clientAddr; // connector's address information
   socklen_t sin_size;
   int yes=1;
+  struct sigaction sa;
   char s[INET6_ADDRSTRLEN];
   int rv;
 
@@ -86,6 +99,14 @@ int main(int argc, char *argv[]){
   if (listen(sockfd, BACKLOG) == -1) {
     perror("listen");
     printf("server:fail to listen to the socket\n");
+    exit(1);
+  }
+
+  sa.sa_handler = sigchld_handler; // reap all dead processes
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = SA_RESTART;
+  if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+    perror("sigaction");
     exit(1);
   }
 

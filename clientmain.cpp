@@ -1,5 +1,3 @@
-#pragma pack(4)
-
 #include <stdio.h>
 #include <stdlib.h>
 /* You will to add includes here */
